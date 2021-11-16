@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.js": "/XMLReader/static/js/main.f981a377.chunk.js",
+    "main.js.map": "/XMLReader/static/js/main.f981a377.chunk.js.map",
+    "runtime-main.js": "/XMLReader/static/js/runtime-main.714cf957.js",
+    "runtime-main.js.map": "/XMLReader/static/js/runtime-main.714cf957.js.map",
+    "static/js/2.1be43979.chunk.js": "/XMLReader/static/js/2.1be43979.chunk.js",
+    "static/js/2.1be43979.chunk.js.map": "/XMLReader/static/js/2.1be43979.chunk.js.map",
+    "index.html": "/XMLReader/index.html",
+    "static/js/2.1be43979.chunk.js.LICENSE.txt": "/XMLReader/static/js/2.1be43979.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.714cf957.js",
+    "static/js/2.1be43979.chunk.js",
+    "static/js/main.f981a377.chunk.js"
+  ]
+}

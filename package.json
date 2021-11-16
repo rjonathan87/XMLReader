@@ -1,6 +1,6 @@
 {
   "homepage": "https://rjonathan87.github.io/XMLReader",
-  "name": "site-xml-read",
+  "name": "xmlreader",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

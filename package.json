@@ -1,7 +1,7 @@
 {
-  "name": "xmlreader",
+  "name": "site-xml-read",
   "version": "0.1.0",
-  "homepage": "https://rjonathan87.github.io/XMLReader",
+  "homepage": "https://rjonathan87.github.io/XMLReader/",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && mv build ./docs || move build ./docs",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

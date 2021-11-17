@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import { processRow, getStorageValue } from "../utils/Functions";
+
 export const XMLReader = () => {
   const mystyle1 = {
     color: "#fff",
@@ -28,43 +30,10 @@ export const XMLReader = () => {
   const [conceptos, setConceptos] = useState([]);
   const [nameFile, setNameFile] = useState('FileGenerated.ini');
 
-  const processRow = (i, row) => {
-    let finalVal = "";
-
-    let convertDescription = row.Descripcion.replace(/(\n)/g, " ");
-
-    finalVal += `[${i}]`;
-    finalVal += "\n";
-    finalVal += `BienesTransp=${row.BienesTransp}`;
-    finalVal += "\n";
-    finalVal += `Descripcion=${convertDescription}`;
-    finalVal += "\n";
-    finalVal += `Cantidad=${row.Cantidad}`;
-    finalVal += "\n";
-    finalVal += `ClaveUnidad=${row.ClaveUnidad}`;
-    finalVal += "\n";
-    finalVal += `Unidad=${row.Unidad}`;
-    finalVal += "\n";
-    finalVal += `CveMaterialPeligroso=${row.CveMaterialPeligroso}`;
-    finalVal += "\n";
-    finalVal += `Embalaje=${row.Embalaje}`;
-    finalVal += "\n";
-    finalVal += `DescripEmbalaje=${row.DescripEmbalaje}`;
-    finalVal += "\n";
-    finalVal += `PesoEnKg=${row.PesoEnKg}`;
-    finalVal += "\n";
-    finalVal += `ValorMercancia=${row.ValorMercancia}`;
-    finalVal += "\n";
-    finalVal += `Moneda=${row.Moneda}`;
-    finalVal += "\n";
-    finalVal += `FraccionArancelaria=${row.FraccionArancelaria}`;
-    finalVal += "\n";
-    finalVal += `UUIDComercioExt=${row.UUIDComercioExt}`;
-    finalVal += "\n";
-    finalVal += `Pedimentos=${row.Pedimentos}`;
-
-    return finalVal + "\n";
-  };
+  useEffect(() => {
+    setNameFile(getStorageValue('nameFile', nameFile));
+  }, [nameFile]);
+  
 
   const generateFile = async () => {
     
@@ -103,18 +72,48 @@ export const XMLReader = () => {
     }
   };
 
-  const getStorageValue = (key, defaultValue) => {
-    // getting stored value
-    const saved = localStorage.getItem(key);
-    const initial = JSON.parse(saved);
-    return initial || defaultValue;
+  const onDrop = files => {
+    Array.from(files)
+      .filter( file => file.type === "text/xml")
+      .forEach( async file => {
+        const text = await file.text();
+        let xmlContent = text;
+        let parser = new DOMParser();
+        let xmlDOM = parser.parseFromString(
+          xmlContent,
+          "application/xml"
+        );
+
+        xmlDOM.activeElement.children[2].childNodes.forEach(
+          (elNode) => {
+            if (elNode.nodeName === "cfdi:Concepto") {
+              let nodoActual = {
+                BienesTransp:
+                  elNode.attributes["ClaveProdServ"].nodeValue,
+                Descripcion:
+                  elNode.attributes["Descripcion"].nodeValue,
+                Cantidad: elNode.attributes["Cantidad"].nodeValue,
+                ClaveUnidad:
+                  elNode.attributes["ClaveUnidad"].nodeValue,
+                Unidad: elNode.attributes["Unidad"].nodeValue,
+                CveMaterialPeligroso: "",
+                Embalaje: "",
+                DescripEmbalaje: "",
+                PesoEnKg: "",
+                ValorMercancia: "",
+                Moneda: "",
+                FraccionArancelaria: "",
+                UUIDComercioExt: "",
+                Pedimentos: "",
+              };
+              // console.log(nodoActual)
+              setConceptos( conceptos => [...conceptos, nodoActual]);
+            }
+          }
+        );
+      });
   }
 
-  useEffect(() => {
-    setNameFile(getStorageValue('nameFile', nameFile));
-  }, [nameFile]);
-
-  
   return (
     <>
       <div className="card text-white bg-secondary mb-3">
@@ -124,59 +123,22 @@ export const XMLReader = () => {
             style={highlighted ? mystyle1 : mystyle2}
             onDragEnter={() => {
               setHighlighted(true);
+              setConceptos([]);
             }}
             onDragLeave={() => {
               setHighlighted(false);
             }}
-            onDragOver={(e) => {
+            onDragOver={ e => {
               e.preventDefault();
             }}
-            onDrop={(e) => {
+            onDrop={ e => {
               e.preventDefault();
 
-              Array.from(e.dataTransfer.files)
-                .filter((file) => file.type === "text/xml")
-                .forEach(async (file) => {
-                  const text = await file.text();
-                  let xmlContent = text;
-                  let parser = new DOMParser();
-                  let xmlDOM = parser.parseFromString(
-                    xmlContent,
-                    "application/xml"
-                  );
-
-                  xmlDOM.activeElement.children[2].childNodes.forEach(
-                    (elNode) => {
-                      if (elNode.nodeName === "cfdi:Concepto") {
-                        let nodoActual = {
-                          BienesTransp:
-                            elNode.attributes["ClaveProdServ"].nodeValue,
-                          Descripcion:
-                            elNode.attributes["Descripcion"].nodeValue,
-                          Cantidad: elNode.attributes["Cantidad"].nodeValue,
-                          ClaveUnidad:
-                            elNode.attributes["ClaveUnidad"].nodeValue,
-                          Unidad: elNode.attributes["Unidad"].nodeValue,
-                          CveMaterialPeligroso: "",
-                          Embalaje: "",
-                          DescripEmbalaje: "",
-                          PesoEnKg: "",
-                          ValorMercancia: "",
-                          Moneda: "",
-                          FraccionArancelaria: "",
-                          UUIDComercioExt: "",
-                          Pedimentos: "",
-                        };
-                        // console.log(nodoActual)
-                        setConceptos((conceptos) => [...conceptos, nodoActual]);
-                      }
-                    }
-                  );
-                });
+              onDrop(e.dataTransfer.files);
             }}
-            onClick={(e) => {
+            onClick={ e => {
               e.preventDefault();
-              // document.getElementById("imgupload").click();
+              document.getElementById("imgupload").click();
             }}
           >
             Coloca aquí tu archivo
@@ -193,10 +155,19 @@ export const XMLReader = () => {
           placeholder={'Default: ' + nameFile.split('.')[0]} 
           onInput={ e => {
             let value = e.target.value;
-            value = value.replace(/ /g, "_");
-            setNameFile(`${value}.ini`);
-            localStorage.setItem("nameFile", JSON.stringify(`${value}.ini`));
+
+              value = value.replace(/ /g, "_");
+              setNameFile(`${value}.ini`);
+              localStorage.setItem("nameFile", JSON.stringify(`${value}.ini`));
           } }
+        />
+        <input 
+          type="file" 
+          id="imgupload" 
+          style={{display: "none"}} 
+          onClick={ () => setConceptos([]) }
+          onChange={ e => onDrop(e.target.files) } 
+          multiple
         />
         <div className="d-grid gap-2">
           <button 

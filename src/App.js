@@ -1,8 +1,11 @@
 import { ReadXML } from "./components/ReadXML";
+import { BrowserRouter } from "react-router-dom";
 
 function App() {
   return (
-    <ReadXML />
+    <BrowserRouter>
+      <ReadXML />
+    </BrowserRouter>
   );
 }
 

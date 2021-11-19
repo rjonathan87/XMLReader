@@ -1,11 +1,14 @@
 import { ReadXML } from "./components/ReadXML";
 import { BrowserRouter } from "react-router-dom";
+import { UserContextProvider } from "./context/UserContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <ReadXML />
-    </BrowserRouter>
+    <UserContextProvider>
+      <BrowserRouter>
+        <ReadXML />
+      </BrowserRouter>
+    </UserContextProvider>
   );
 }
 
